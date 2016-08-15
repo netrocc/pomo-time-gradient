@@ -1,0 +1,28 @@
+html, body {
+	margin:0;
+	padding:0;
+	width:100%;
+	height:100%;
+	overflow:hidden;
+}
+body {
+	font-family:'Lato',sans-serif;
+	font-size:12px;
+}
+canvas {
+	vertical-align:bottom;
+}
+
+div#container {
+	position:absolute;
+	width:100%;
+	height:100%;
+	cursor:pointer;
+}
+
+div.digit {
+	position:absolute;
+	font-size:48px;
+	color:rgba(255,255,255,0.3);
+	pointer-events:none;
+}

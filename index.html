@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+		<title>POMO</title>
+		<meta name="description" content="">
+		<meta name="keywords" content="">
+		
+		<link href='https://fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="/assets/css/reset.css" type="text/css" charset="utf-8">
+		<link rel="stylesheet" href="/assets/css/style.css" type="text/css" charset="utf-8">
+		<script src="/assets/js/WebAudioAPI.js"></script>
+		<script src="/assets/js/three.min.js"></script>
+		<script src="/assets/js/RequestAnimationFrame.js"></script>
+		<script src="./app.js"></script>
+	</head>
+	<body>
+		<div id="container"></div>
+
+		<div class="digit" id="hours"></div>
+		<div class="digit" id="minutes">15</div>
+		<div class="digit" id="seconds">23</div>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+			void main() {
+				gl_Position = vec4(position, 1.0);
+			}
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+			uniform vec2 iResolution;
+			uniform float iGlobalTime;
+
+			uniform vec2 hours;
+			uniform vec2 minutes;
+			uniform vec2 seconds;
+
+			uniform vec2 mouse;
+			uniform vec2 click;
+
+			void main(void) {
+				//uv is between 0 and 1
+				vec2 uv = gl_FragCoord.xy / iResolution.xy;
+
+				vec2 h = hours;
+				vec2 m = minutes;
+				vec2 s = seconds;
+
+				vec2 step = (click - mouse) * (1.0 - distance(mouse, uv));
+				h -= step;
+				m -= step;
+				s -= step;
+
+
+				float r = distance(uv, h) * 1.5;
+				float g = distance(uv, m) * 1.5;
+				float b = distance(uv, s) * 1.5;
+
+/*
+				float r = 1.0 - distance(uv, h);
+				float g = 1.0 - distance(uv, m);
+				float b = 1.0 - distance(uv, s);
+*/
+
+				gl_FragColor = vec4(r, g, b, 1.0);
+			}
+		</script>
+	</body>
+</html>
