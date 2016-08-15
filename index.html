@@ -6,10 +6,11 @@
 		<title>POMO</title>
 		<meta name="description" content="">
 		<meta name="keywords" content="">
+		<meta name="author" content="NETRO">
 		
-		<link href='https://fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="/assets/css/reset.css" type="text/css" charset="utf-8">
 		<link rel="stylesheet" href="/assets/css/style.css" type="text/css" charset="utf-8">
+
 		<script src="/assets/js/WebAudioAPI.js"></script>
 		<script src="/assets/js/three.min.js"></script>
 		<script src="/assets/js/RequestAnimationFrame.js"></script>
@@ -19,8 +20,13 @@
 		<div id="container"></div>
 
 		<div class="digit" id="hours"></div>
-		<div class="digit" id="minutes">15</div>
-		<div class="digit" id="seconds">23</div>
+		<div class="digit" id="minutes"></div>
+		<div class="digit" id="seconds"></div>
+
+		<div id="ui">
+			<p>Press i to invert colors</p>
+			<input type="range" id="colorAmplifier" value="4.0" min="0.0" max="16.0" step="0.1">
+		</div>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 			void main() {
@@ -39,6 +45,9 @@
 			uniform vec2 mouse;
 			uniform vec2 click;
 
+			uniform int invertColors;
+			uniform float colorAmplifier;
+
 			void main(void) {
 				//uv is between 0 and 1
 				vec2 uv = gl_FragCoord.xy / iResolution.xy;
@@ -52,16 +61,19 @@
 				m -= step;
 				s -= step;
 
+				float dh = distance(uv, h);
+				float dm = distance(uv, m);
+				float ds = distance(uv, s);
 
-				float r = distance(uv, h) * 1.5;
-				float g = distance(uv, m) * 1.5;
-				float b = distance(uv, s) * 1.5;
+				float r = 1.0 - (dh*dh*colorAmplifier);
+				float g = 1.0 - (dm*dm*colorAmplifier);
+				float b = 1.0 - (ds*ds*colorAmplifier);
 
-/*
-				float r = 1.0 - distance(uv, h);
-				float g = 1.0 - distance(uv, m);
-				float b = 1.0 - distance(uv, s);
-*/
+				if (invertColors == 1) {
+					r = 1.0-r;
+					g = 1.0-g;
+					b = 1.0-b;
+				}
 
 				gl_FragColor = vec4(r, g, b, 1.0);
 			}

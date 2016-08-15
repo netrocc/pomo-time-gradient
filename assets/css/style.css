@@ -6,7 +6,7 @@ html, body {
 	overflow:hidden;
 }
 body {
-	font-family:'Lato',sans-serif;
+	font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;
 	font-size:12px;
 }
 canvas {
@@ -23,6 +23,13 @@ div#container {
 div.digit {
 	position:absolute;
 	font-size:48px;
-	color:rgba(255,255,255,0.3);
+	color:rgba(255,255,255,0.4);
 	pointer-events:none;
+}
+
+div#ui {
+	position:absolute;
+	bottom:32px;
+	left:64px;
+	color:rgba(255,255,255,0.4);
 }

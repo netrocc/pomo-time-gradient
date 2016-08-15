@@ -24,29 +24,39 @@ function App() {
 	var timeOffsetStep = 0.0;
 
 	//AUDIO
+	var fileType;
 	var distortion;
 	var audioCounter = 0.0;
 
 	//UI
 	var divHours, divMinutes, divSeconds;
+	var colorAmplifier;
+	var invertColors = false;
 
 
 	function initialize() {
-
-		distortion = context.createWaveShaper();
-
-		loadSounds(this, {
-			tick: '/assets/audio/test.wav'
-		}, function() {
-			play();
-		});
-
-
 		container = document.getElementById('container');
 		divHours = document.getElementById('hours');
 		divMinutes = document.getElementById('minutes');
 		divSeconds = document.getElementById('seconds');
 
+		colorAmplifier = document.getElementById('colorAmplifier');
+
+		//AUDIO
+		var a = document.createElement('audio');
+		if (!!(a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''))) fileType = 'mp3';
+		else if (!!(a.canPlayType && a.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, ''))) fileType = 'ogg';
+		else fileType = 'wav';
+
+		distortion = context.createWaveShaper();
+
+		loadSounds(this, {
+			tick: '/assets/audio/9.wav' //ADD FILETYPE VARIABLE
+		}, function() {
+			play();
+		});
+
+		//THREE.JS
 		scene = new THREE.Scene();
 		camera = new THREE.Camera();
 		camera.position.z = 1;
@@ -62,7 +72,9 @@ function App() {
 			minutes: { type: "v2", value: new THREE.Vector2() },
 			seconds: { type: "v2", value: new THREE.Vector2() },
 			mouse: { type: "v2", value: new THREE.Vector2() },
-			click: { type: "v2", value: new THREE.Vector2() }
+			click: { type: "v2", value: new THREE.Vector2() },
+			invertColors: { type: "i", value: 0 },
+			colorAmplifier: { type: "f", value: 4.0 }
 		};
 
 		var material = new THREE.ShaderMaterial({
@@ -77,14 +89,20 @@ function App() {
 		renderer = new THREE.WebGLRenderer();
 		container.appendChild(renderer.domElement);
 
+		//EVENTS
 		onWindowResize();
 		animate();
 
 		window.addEventListener('resize', onWindowResize, false);
 
-		document.addEventListener('mousedown', onMouseDown, false);
-		document.addEventListener('mouseup', onMouseUp, false);
-		document.addEventListener('mousemove', onMouseMove, false);
+		container.addEventListener('mousedown', onMouseDown, false);
+		container.addEventListener('mouseup', onMouseUp, false);
+		container.addEventListener('mousemove', onMouseMove, false);
+		
+		document.addEventListener('keypress', onKeyPress, false);
+		colorAmplifier.addEventListener('input', function(event) {
+			uniforms.colorAmplifier.value = colorAmplifier.value;
+		}, false);
 	}
 
 	function animate() {
@@ -148,12 +166,12 @@ function App() {
 
 		//console.log(hDeg + ":" + mDeg + ":" + sDeg);
 
-		var hX = 0.5 + Math.sin(hDeg) * 0.25;
-		var hY = 0.5 + Math.cos(hDeg) * 0.25;
-		var mX = 0.5 + Math.sin(mDeg) * 0.5;
-		var mY = 0.5 + Math.cos(mDeg) * 0.5;
-		var sX = 0.5 + Math.sin(sDeg) * 0.75;
-		var sY = 0.5 + Math.cos(sDeg) * 0.75;
+		var hX = 0.5 + Math.sin(hDeg) * 0.1;
+		var hY = 0.5 + Math.cos(hDeg) * 0.1;
+		var mX = 0.5 + Math.sin(mDeg) * 0.2;
+		var mY = 0.5 + Math.cos(mDeg) * 0.2;
+		var sX = 0.5 + Math.sin(sDeg) * 0.3;
+		var sY = 0.5 + Math.cos(sDeg) * 0.3;
 
 		//console.log(hX + ":" + hY + ", " + mX + ":" + mY + ", " + sX + ":" + sY);
 
@@ -224,11 +242,8 @@ function App() {
 			var dist = mouseStart.distanceTo(mousePosition);
 			var dx = mousePosition.x - mouseStart.x < 0.0 ? -1.0 : 1.0;
 			var dy = mousePosition.y - mouseStart.y < 0.0 ? -1.0 : 1.0;
-			timeOffset = dist*120.0*dx;
-			//console.log(timeOffset);
-			timeOffsetStep = timeOffset / 10.0;
-
-			//console.log(timeOffsetStep);
+			timeOffset = dist*12000.0*dx; //shift speed
+			timeOffsetStep = timeOffset / 50.0; //rewind speed
 		}
 	}
 
@@ -261,6 +276,18 @@ function App() {
 		lerpCounter = 1.0;
 
 		//uniforms.mouse.value = vecMinus;
+	}
+
+	function onKeyPress(event) {
+		console.log(event.keyCode);
+		switch(event.keyCode) {
+			case 105:
+				invertColors = !invertColors;
+				if (invertColors) uniforms.invertColors.value = 1;
+				else uniforms.invertColors.value = 0;
+				break;
+			default: break;
+		}
 	}
 
 	/*
