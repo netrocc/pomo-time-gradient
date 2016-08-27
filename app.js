@@ -211,7 +211,7 @@ function App() {
 		source.connect(context.destination);
 
 		loadSounds(this, {
-			tick: '/assets/audio/8.wav' //ADD FILETYPE VARIABLE
+			tick: '/assets/audio/pomo-tempo.' + fileType
 		}, function() {
 			play();
 		});
