@@ -22,14 +22,7 @@ div#container {
 
 div.digit {
 	position:absolute;
-	font-size:48px;
-	color:rgba(255,255,255,0.4);
+	font-size:64px;
+	color:rgba(0,0,0,1.0);
 	pointer-events:none;
-}
-
-div#ui {
-	position:absolute;
-	bottom:32px;
-	left:64px;
-	color:rgba(255,255,255,0.4);
 }

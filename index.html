@@ -23,11 +23,6 @@
 		<div class="digit" id="minutes"></div>
 		<div class="digit" id="seconds"></div>
 
-		<div id="ui">
-			<p>Press i to invert colors</p>
-			<input type="range" id="colorAmplifier" value="4.0" min="0.0" max="16.0" step="0.1">
-		</div>
-
 		<script id="vertexShader" type="x-shader/x-vertex">
 			void main() {
 				gl_Position = vec4(position, 1.0);

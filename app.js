@@ -23,9 +23,11 @@ function App() {
 	var timeOffset = 0.0;
 	var timeOffsetStep = 0.0;
 
+	var pitch = 1.0;
+
 	//AUDIO
 	var fileType;
-	var distortion;
+	var source;
 	var audioCounter = 0.0;
 
 	//UI
@@ -42,21 +44,30 @@ function App() {
 
 		colorAmplifier = document.getElementById('colorAmplifier');
 
-		//AUDIO
-		var a = document.createElement('audio');
-		if (!!(a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''))) fileType = 'mp3';
-		else if (!!(a.canPlayType && a.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, ''))) fileType = 'ogg';
-		else fileType = 'wav';
+		initAudio();
+		initThreeJs();
 
-		distortion = context.createWaveShaper();
+		//EVENTS
+		onWindowResize();
+		animate();
 
-		loadSounds(this, {
-			tick: '/assets/audio/9.wav' //ADD FILETYPE VARIABLE
-		}, function() {
-			play();
-		});
+		window.addEventListener('resize', onWindowResize, false);
 
-		//THREE.JS
+		container.addEventListener('mousedown', onMouseDown, false);
+		container.addEventListener('mouseup', onMouseUp, false);
+		container.addEventListener('mousemove', onMouseMove, false);
+
+		container.addEventListener('touchstart', onMouseDown, false);
+		container.addEventListener('touchend', onMouseUp, false);
+		container.addEventListener('touchmove', onMouseMove, false);
+	}
+
+
+	/*
+	 *	THREE.JS
+	 */
+
+	function initThreeJs() {
 		scene = new THREE.Scene();
 		camera = new THREE.Camera();
 		camera.position.z = 1;
@@ -74,7 +85,7 @@ function App() {
 			mouse: { type: "v2", value: new THREE.Vector2() },
 			click: { type: "v2", value: new THREE.Vector2() },
 			invertColors: { type: "i", value: 0 },
-			colorAmplifier: { type: "f", value: 4.0 }
+			colorAmplifier: { type: "f", value: 2.4 }
 		};
 
 		var material = new THREE.ShaderMaterial({
@@ -88,27 +99,8 @@ function App() {
 
 		renderer = new THREE.WebGLRenderer();
 		container.appendChild(renderer.domElement);
-
-		//EVENTS
-		onWindowResize();
-		animate();
-
-		window.addEventListener('resize', onWindowResize, false);
-
-		container.addEventListener('mousedown', onMouseDown, false);
-		container.addEventListener('mouseup', onMouseUp, false);
-		container.addEventListener('mousemove', onMouseMove, false);
-		
-		document.addEventListener('keypress', onKeyPress, false);
-		colorAmplifier.addEventListener('input', function(event) {
-			uniforms.colorAmplifier.value = colorAmplifier.value;
-		}, false);
 	}
 
-	function animate() {
-		requestAnimationFrame(animate);
-		render();
-	}
 
 	function render() {
 		uniforms.iGlobalTime.value = clock.getElapsedTime();
@@ -126,8 +118,9 @@ function App() {
 			audioCounter -= 0.0125;
 		}
 		
-		var dist = mouseStart.distanceTo(mousePosition);
-		distortion.curve = makeDistortionCurve(dist * 20.0 * easeInQuad(audioCounter));
+		var dist = mouseStart.distanceTo(mousePosition) * 2.4;
+		pitch = 1.0 - dist * easeInQuad(audioCounter);
+		source.playbackRate.value = pitch;
 
 
 		if (!mouseDown && timeOffset != 0.0) {
@@ -155,7 +148,7 @@ function App() {
 		
 		var h = ((hours*60.0 + minutes)*60.0 + seconds + milliSeconds*0.001) / 86400.0;
 		var m = (minutes*60.0 + seconds + milliSeconds*0.001) / 3600.0;
-		var s = (seconds + milliSeconds*0.001) / 60.0;
+		var s = (seconds + milliSeconds*0.001) / 60.0 * pitch;
 
 		//console.log(h + ":" + m + ":" + s);
 
@@ -188,7 +181,7 @@ function App() {
 		// DIGITS
 		divHours.innerHTML = addLeading(hours);
 		divMinutes.innerHTML = addLeading(minutes);
-		divSeconds.innerHTML = addLeading(seconds);
+		divSeconds.innerHTML = addLeading(Math.floor(pitch * (seconds + milliSeconds * 0.001)) % 60);
 
 		var cx = container.clientWidth*0.5;
 		var cy = container.clientHeight*0.5;
@@ -203,10 +196,39 @@ function App() {
 		divSeconds.style.top = cy + Math.sin(sDeg-0.5*Math.PI)*container.clientHeight*0.4 + 'px';
 	}
 
-	function addLeading(num) {
-		if (num < 10) return "0" + num;
-		else return num;
+
+	/*
+	 *	AUDIO
+	 */
+
+	function initAudio() {
+		var a = document.createElement('audio');
+		if (!!(a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''))) fileType = 'mp3';
+		else if (!!(a.canPlayType && a.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, ''))) fileType = 'ogg';
+		else fileType = 'wav';
+
+		//nodes
+		source = context.createBufferSource();
+		
+		//chain
+		source.connect(context.destination);
+		
+		//load
+		loadSounds(this, {
+			tick: '/assets/audio/8.wav' //ADD FILETYPE VARIABLE
+		}, function() {
+			play();
+		});
 	}
+
+	function play() {
+		//playSound(this.tick, 0.0, true);
+
+		source.buffer = this.tick;
+		source[source.start ? 'start' : 'noteOn'](0);
+		source.loop = true;
+	}
+
 
 	/*
 	 *	EVENTS
@@ -219,7 +241,15 @@ function App() {
 		renderer.setSize(container.clientWidth, container.clientHeight);
 	}
 
+	function onTouchMove(event) {
+		move(event, 3000.0);
+	}
+
 	function onMouseMove(event) {
+		move(event, 12000.0);
+	}
+
+	function move(event, speed) {
 		var mouseX = event.pageX;
 		var mouseY = event.pageY;
 
@@ -242,7 +272,7 @@ function App() {
 			var dist = mouseStart.distanceTo(mousePosition);
 			var dx = mousePosition.x - mouseStart.x < 0.0 ? -1.0 : 1.0;
 			var dy = mousePosition.y - mouseStart.y < 0.0 ? -1.0 : 1.0;
-			timeOffset = dist*12000.0*dx; //shift speed
+			timeOffset = dist*speed*dx; //shift speed
 			timeOffsetStep = timeOffset / 50.0; //rewind speed
 		}
 	}
@@ -278,17 +308,27 @@ function App() {
 		//uniforms.mouse.value = vecMinus;
 	}
 
-	function onKeyPress(event) {
-		console.log(event.keyCode);
-		switch(event.keyCode) {
-			case 105:
-				invertColors = !invertColors;
-				if (invertColors) uniforms.invertColors.value = 1;
-				else uniforms.invertColors.value = 0;
-				break;
-			default: break;
-		}
+
+	/*
+	 *	ANIMATION FRAME
+	 */
+
+	function animate() {
+		requestAnimationFrame(animate);
+		render();
 	}
+
+
+	/*
+	 *	UTILS
+	 */
+
+	function addLeading(num) {
+		if (num < 0) num += 60.0;
+		if (num < 10) return "0" + num;
+		else return num;
+	}
+
 
 	/*
 	 *	EASING
@@ -303,58 +343,6 @@ function App() {
 	}
 
 
-	/*
-	 *	AUDIO
-	 */
-
-	function play() {
-		//playSound(this.tick, 0.0, true);
-
-		// Create the source.
-		var source = context.createBufferSource();
-		source.buffer = this.tick;
-
-		//source.connect(context.destination);
-		/*
-		// Create the filter.
-		var filter = context.createBiquadFilter();
-		filter.type = filter.LOWPASS;
-		filter.frequency.value = 5000;
-		// Connect source to filter, filter to destination.
-		source.connect(filter);
-		filter.connect(context.destination);
-		*/
-
-		
-		
-
-		source.connect(distortion);
-		distortion.connect(context.destination);
-
-		distortion.curve = makeDistortionCurve(0);
-
-		// Play!
-		source[source.start ? 'start' : 'noteOn'](0);
-		source.loop = true;
-		// Save source and filterNode for later access.
-		this.source = source;
-		//this.filter = filter;
-	}
-
-	function makeDistortionCurve(amount) {
-		var k = typeof amount === 'number' ? amount : 50;
-		var n_samples = 44100;
-		var curve = new Float32Array(n_samples);
-		var deg = Math.PI / 180;
-		var x;
-		for (var i=0 ; i < n_samples; ++i ) {
-			x = i * 2 / n_samples - 1;
-			curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
-		}
-		return curve;
-	}
-
-	
 	return {
 		initialize: initialize
 	};
