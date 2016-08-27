@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+		<title>POMO</title>
+		<meta name="description" content="Gradient Clock">
+		<meta name="keywords" content="time">
+		<meta name="author" content="NETRO">
+
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+		
+		<link rel="stylesheet" href="/assets/css/reset.css" type="text/css" charset="utf-8">
+		<link rel="stylesheet" href="/assets/css/style.css" type="text/css" charset="utf-8">
+
+		<script src="./assets/js/WebAudioAPI.js"></script>
+		<script src="./assets/js/three.min.js"></script>
+		<script src="./assets/js/RequestAnimationFrame.js"></script>
+		<script src="./app.js"></script>
+	</head>
+	<body>
+		<div id="container"></div>
+
+		<div class="digit" id="hours"></div>
+		<div class="digit" id="minutes"></div>
+		<div class="digit" id="seconds"></div>
+
+		<script id="vertexShader" type="x-shader/x-vertex">
+			void main() {
+				gl_Position = vec4(position, 1.0);
+			}
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">
+			uniform vec2 iResolution;
+			uniform float iGlobalTime;
+
+			uniform vec2 hours;
+			uniform vec2 minutes;
+			uniform vec2 seconds;
+
+			uniform vec2 mouse;
+			uniform vec2 click;
+
+			uniform int invertColors;
+			uniform float colorAmplifier;
+
+			void main(void) {
+				vec2 uv = gl_FragCoord.xy / iResolution.xy;
+
+				vec2 h = hours;
+				vec2 m = minutes;
+				vec2 s = seconds;
+
+				vec2 step = (click - mouse) * (1.0 - distance(mouse, uv));
+				h -= step;
+				m -= step;
+				s -= step;
+
+				float dh = distance(uv, h);
+				float dm = distance(uv, m);
+				float ds = distance(uv, s);
+
+				float r = 1.0 - (dh*dh*colorAmplifier);
+				float g = 1.0 - (dm*dm*colorAmplifier);
+				float b = 1.0 - (ds*ds*colorAmplifier);
+
+				if (invertColors == 1) {
+					r = 1.0-r;
+					g = 1.0-g;
+					b = 1.0-b;
+				}
+
+				gl_FragColor = vec4(r, g, b, 1.0);
+			}
+		</script>
+	</body>
+</html>
