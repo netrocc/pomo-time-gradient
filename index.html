@@ -4,16 +4,18 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 		<title>POMO</title>
-		<meta name="description" content="">
-		<meta name="keywords" content="">
+		<meta name="description" content="Gradient Clock">
+		<meta name="keywords" content="time">
 		<meta name="author" content="NETRO">
+
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
 		
 		<link rel="stylesheet" href="/assets/css/reset.css" type="text/css" charset="utf-8">
 		<link rel="stylesheet" href="/assets/css/style.css" type="text/css" charset="utf-8">
 
-		<script src="/assets/js/WebAudioAPI.js"></script>
-		<script src="/assets/js/three.min.js"></script>
-		<script src="/assets/js/RequestAnimationFrame.js"></script>
+		<script src="./assets/js/WebAudioAPI.js"></script>
+		<script src="./assets/js/three.min.js"></script>
+		<script src="./assets/js/RequestAnimationFrame.js"></script>
 		<script src="./app.js"></script>
 	</head>
 	<body>
@@ -44,7 +46,6 @@
 			uniform float colorAmplifier;
 
 			void main(void) {
-				//uv is between 0 and 1
 				vec2 uv = gl_FragCoord.xy / iResolution.xy;
 
 				vec2 h = hours;

@@ -1,6 +1,6 @@
 /*
- * ...
- * NETRO
+ * Gradient Clock for the POMO
+ * NETRO 2016
  * https://netro.cc/
  *
  */
@@ -85,7 +85,7 @@ function App() {
 			mouse: { type: "v2", value: new THREE.Vector2() },
 			click: { type: "v2", value: new THREE.Vector2() },
 			invertColors: { type: "i", value: 0 },
-			colorAmplifier: { type: "f", value: 2.4 }
+			colorAmplifier: { type: "f", value: 2.0 }
 		};
 
 		var material = new THREE.ShaderMaterial({
@@ -207,13 +207,9 @@ function App() {
 		else if (!!(a.canPlayType && a.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, ''))) fileType = 'ogg';
 		else fileType = 'wav';
 
-		//nodes
 		source = context.createBufferSource();
-		
-		//chain
 		source.connect(context.destination);
-		
-		//load
+
 		loadSounds(this, {
 			tick: '/assets/audio/8.wav' //ADD FILETYPE VARIABLE
 		}, function() {
@@ -223,7 +219,6 @@ function App() {
 
 	function play() {
 		//playSound(this.tick, 0.0, true);
-
 		source.buffer = this.tick;
 		source[source.start ? 'start' : 'noteOn'](0);
 		source.loop = true;
@@ -237,19 +232,10 @@ function App() {
 	function onWindowResize(event) {
 		uniforms.iResolution.value.x = container.clientWidth;
 		uniforms.iResolution.value.y = container.clientHeight;
-
 		renderer.setSize(container.clientWidth, container.clientHeight);
 	}
 
-	function onTouchMove(event) {
-		move(event, 3000.0);
-	}
-
 	function onMouseMove(event) {
-		move(event, 12000.0);
-	}
-
-	function move(event, speed) {
 		var mouseX = event.pageX;
 		var mouseY = event.pageY;
 
@@ -272,7 +258,7 @@ function App() {
 			var dist = mouseStart.distanceTo(mousePosition);
 			var dx = mousePosition.x - mouseStart.x < 0.0 ? -1.0 : 1.0;
 			var dy = mousePosition.y - mouseStart.y < 0.0 ? -1.0 : 1.0;
-			timeOffset = dist*speed*dx; //shift speed
+			timeOffset = dist*12000.0*dx; //shift speed
 			timeOffsetStep = timeOffset / 50.0; //rewind speed
 		}
 	}
@@ -304,7 +290,6 @@ function App() {
 	function onMouseUp(event) {
 		mouseDown = false;
 		lerpCounter = 1.0;
-
 		//uniforms.mouse.value = vecMinus;
 	}
 

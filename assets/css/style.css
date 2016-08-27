@@ -12,17 +12,16 @@ body {
 canvas {
 	vertical-align:bottom;
 }
-
 div#container {
 	position:absolute;
 	width:100%;
 	height:100%;
 	cursor:pointer;
 }
-
 div.digit {
 	position:absolute;
 	font-size:64px;
-	color:rgba(0,0,0,1.0);
+	font-size:5.0vw;
+	color:#000;
 	pointer-events:none;
 }
