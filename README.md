@@ -2,6 +2,8 @@
 
 **WebGL and Web Audio API splash page for [POMO], Milan**
 
+![MacDown logo](screenshot.png)
+
 [NETRO] 2016
 
 ----

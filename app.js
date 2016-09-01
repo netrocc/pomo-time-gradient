@@ -211,7 +211,7 @@ function App() {
 		source.connect(context.destination);
 
 		loadSounds(this, {
-			tick: '/assets/audio/pomo-tempo.' + fileType
+			tick: './assets/audio/pomo-tempo.' + fileType
 		}, function() {
 			play();
 		});
@@ -236,8 +236,10 @@ function App() {
 	}
 
 	function onMouseMove(event) {
-		var mouseX = event.pageX;
-		var mouseY = event.pageY;
+		event.preventDefault();
+
+		var mouseX = event.pageX || event.changedTouches[0].pageX;
+		var mouseY = event.pageY || event.changedTouches[0].pageY;
 
 		if (mouseDown) {
 			if (lerpCounter <= 0.0) {
@@ -264,11 +266,13 @@ function App() {
 	}
 
 	function onMouseDown(event) {
+		event.preventDefault();
+		
 		mouseDown = true;
 		audioCounter = 1.0;
 
-		var mouseX = event.pageX;
-		var mouseY = event.pageY;
+		var mouseX = event.pageX || event.changedTouches[0].pageX;
+		var mouseY = event.pageY || event.changedTouches[0].pageY;
 
 		if (lerpCounter <= 0.0) {
 			mouseStart.x = mouseX/container.clientWidth;
@@ -288,6 +292,8 @@ function App() {
 	}
 
 	function onMouseUp(event) {
+		event.preventDefault();
+
 		mouseDown = false;
 		lerpCounter = 1.0;
 		//uniforms.mouse.value = vecMinus;
