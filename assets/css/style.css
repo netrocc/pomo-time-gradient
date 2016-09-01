@@ -20,8 +20,13 @@ div#container {
 }
 div.digit {
 	position:absolute;
-	font-size:64px;
-	font-size:5.0vw;
+	font-size:4.5vw;
+  	letter-spacing:-0.05vw;
 	color:#000;
 	pointer-events:none;
+}
+@media(max-width: 768px) {
+	div.digit {
+		font-size:4.2vw;
+	}
 }

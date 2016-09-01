@@ -8,10 +8,13 @@
 
 ----
 
-### License
-All rights reserved
+WebGL is running via [three.js]
 
 ----
 
-[NETRO]: <https://www.netro.cc>
+### License
+All rights reserved
+
+[NETRO]: <https://www.netro.cc/>
 [POMO]: <http://thepomo.com/>
+[three.js]: <http://threejs.org/>

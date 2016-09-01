@@ -24,10 +24,11 @@ function App() {
 	var timeOffsetStep = 0.0;
 
 	var pitch = 1.0;
+	var direction = 1;
 
 	//AUDIO
 	var fileType;
-	var source;
+	var source, sourceReverse;
 	var audioCounter = 0.0;
 
 	//UI
@@ -37,6 +38,11 @@ function App() {
 
 
 	function initialize() {
+		if (!Detector.webgl) initFallback();
+		else initFullPage();
+	}
+
+	function initFullPage() {
 		container = document.getElementById('container');
 		divHours = document.getElementById('hours');
 		divMinutes = document.getElementById('minutes');
@@ -60,6 +66,12 @@ function App() {
 		container.addEventListener('touchstart', onMouseDown, false);
 		container.addEventListener('touchend', onMouseUp, false);
 		container.addEventListener('touchmove', onMouseMove, false);
+	}
+
+	function initFallback() {
+		container = document.getElementById('container');
+		container.style.backgroundImage = 'url(./assets/images/fb' + Math.floor(Math.random() * 3.0) + '.jpg)';
+		container.style.backgroundSize = 'cover';
 	}
 
 
@@ -101,7 +113,6 @@ function App() {
 		container.appendChild(renderer.domElement);
 	}
 
-
 	function render() {
 		uniforms.iGlobalTime.value = clock.getElapsedTime();
 
@@ -120,7 +131,7 @@ function App() {
 		
 		var dist = mouseStart.distanceTo(mousePosition) * 2.4;
 		pitch = 1.0 - dist * easeInQuad(audioCounter);
-		source.playbackRate.value = pitch;
+		source.playbackRate.value = Math.abs(pitch);
 
 
 		if (!mouseDown && timeOffset != 0.0) {
@@ -224,6 +235,21 @@ function App() {
 		source.loop = true;
 	}
 
+	function checkPlaybackDirection() {
+		if (pitch < 0.0 && direction == 1) {
+			changePlaybackDirection();
+			direction = 0;
+		} else if (pitch > 0.0 && direction == 0) {
+			changePlaybackDirection();
+			direction = 1;
+		}
+	}
+
+	function changePlaybackDirection() {
+		Array.prototype.reverse.call(source.buffer.getChannelData(0));
+		Array.prototype.reverse.call(source.buffer.getChannelData(1));
+	}
+
 
 	/*
 	 *	EVENTS
@@ -306,6 +332,7 @@ function App() {
 
 	function animate() {
 		requestAnimationFrame(animate);
+		checkPlaybackDirection();
 		render();
 	}
 
