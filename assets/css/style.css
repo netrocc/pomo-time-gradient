@@ -21,12 +21,17 @@ div#container {
 div.digit {
 	position:absolute;
 	font-size:4.5vw;
-  	letter-spacing:-0.05vw;
+	letter-spacing:-0.05vw;
 	color:#000;
 	pointer-events:none;
 }
-@media(max-width: 768px) {
+@media (max-width: 768px) {
 	div.digit {
 		font-size:4.2vw;
+	}
+}
+@media (max-aspect-ratio: 13/9) and (orientation: portrait) {
+	div.digit {
+		font-size:6.5vw;
 	}
 }

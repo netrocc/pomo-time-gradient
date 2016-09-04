@@ -71,6 +71,12 @@ function App() {
 	function initFallback() {
 		container = document.getElementById('container');
 		container.style.backgroundImage = 'url(./assets/images/fb' + Math.floor(Math.random() * 3.0) + '.jpg)';
+		container.style.backgroundRepeat = 'no-repeat';
+		container.style.backgroundPosition = 'center center';
+		container.style.webkitBackgroundSize = 'cover';
+		container.style.MozBackgroundSize = 'cover';
+		container.style.msBackgroundSize = 'cover';
+		container.style.OBackgroundSize = 'cover';
 		container.style.backgroundSize = 'cover';
 	}
 
