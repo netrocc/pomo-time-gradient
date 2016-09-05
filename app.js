@@ -36,8 +36,12 @@ function App() {
 	var colorAmplifier;
 	var invertColors = false;
 
+	//MOBILE DETECT
+	var md;
+
 
 	function initialize() {
+		md = new MobileDetect(window.navigator.userAgent);
 		if (!Detector.webgl) initFallback();
 		else initFullPage();
 	}
@@ -50,7 +54,7 @@ function App() {
 
 		colorAmplifier = document.getElementById('colorAmplifier');
 
-		initAudio();
+		if (!md.mobile()) initAudio();
 		initThreeJs();
 
 		//EVENTS
@@ -137,7 +141,7 @@ function App() {
 		
 		var dist = mouseStart.distanceTo(mousePosition) * 2.4;
 		pitch = 1.0 - dist * easeInQuad(audioCounter);
-		source.playbackRate.value = Math.abs(pitch);
+		if (!md.mobile()) source.playbackRate.value = Math.abs(pitch);
 
 
 		if (!mouseDown && timeOffset != 0.0) {
@@ -338,7 +342,7 @@ function App() {
 
 	function animate() {
 		requestAnimationFrame(animate);
-		checkPlaybackDirection();
+		if (!md.mobile()) checkPlaybackDirection();
 		render();
 	}
 
